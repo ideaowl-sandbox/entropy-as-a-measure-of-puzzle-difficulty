@@ -1,0 +1,285 @@
+<html>
+    <head>
+        <title>The Witness Puzzle</title>
+        <meta name="robots" content="noindex">
+        <meta charset="utf-8"/>
+        <script src="src/lib/_dependencies/moment.js/2.22.2/moment.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
+        <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
+        <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
+        <!-- <script src="https://www.gstatic.com/firebasejs/5.0.0/firebase-database.js"></script> -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="google-site-verification" content="uh8PeFJEaWiLXtMePwhCwrsQkLx9-k9AQ8rd5MscA6U" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|Slabo+27px" rel="stylesheet">
+        <style>
+            h1, h2, h3 {
+                font-family: 'Slabo 27px', serif;  
+            }
+            p, body, .caption {
+                font-family: 'Open Sans', sans-serif;
+            }
+            p, h1, h2, h3, li {
+                max-width: 800px;
+            }
+
+            li {
+                margin-bottom: 10px;
+            }
+
+            .loadingSection {
+                background-color: #eee;
+                max-width: 800px;
+                padding: 20px;
+            }
+
+
+            body {
+                margin: 25px;
+                padding-bottom: 80px;
+            }
+
+            a {
+                color: blue;
+                text-decoration: none;
+            }
+
+            .witnessPuzzleContainer {
+                margin: 0px 20px 20px 0px;
+                cursor: pointer;
+            }
+
+            .witnessPuzzleContainer {
+                width: 300px;
+                height: 300px;
+            }
+
+            .witnessPuzzleContainer.medium{
+                width: 200px;
+                height: 200px;
+            }
+
+            .witnessPuzzleContainer.small{
+                width: 100px;
+                height: 100px;
+            }
+
+            .witnessPuzzleContainer.micro{
+                width: 50px;
+                height: 50px;
+            }
+
+
+        </style>
+    </head>
+
+    <body>
+
+        <center>
+            <div id='noES6ModuleLoading' style='display: none;'>
+                <!-- <img id='splashImage' src='public/assets/mdp.ai-splash.png'> -->
+                <div id='splashNoES6Text' class='caption' style='font-size: 11.5px; color: #333; margin-bottom: 10px;'>(If you
+                    use Chrome you'll see a running demo instead of the image above)</div>
+            </div>
+        </center>
+
+            <h1>Updates for 2019-07-25</h1>
+            <h2>Ideas from last email</h2>
+            <ul>
+                <li>Change circles into rounded squares</li>
+                <li>Fix issue with correct solution not working on puzzle from last week</li>
+            </ul>
+            <h2>Next steps from previous update</h2>
+            <ul>
+                <li>
+                    Generating between other constraints beyond rounded squares: 
+                    must crosses and broken junctions
+                </li>
+                <li>
+                    Visualizing results
+                </li>
+            </ul>
+
+            <h2>Updates</h2>
+
+            <div id='updatesSection'>
+                <div class='loadingSection'>
+                    <div class='loadingText'>
+                        <h3>Loading...</h3>
+                        <p>Note: The rest of this page will take a while to populate, the puzzles are being generated...</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <h2>Discussion Points and Questions</h2>
+            <h3>General Thoughts</h3>
+            <ul>
+                <li>
+                    While performance is a concern, I'm not convinced it's the issue at this point.  
+                    The 2x1 grid is trivial if only using the colored square constraints, but adding only 3 
+                    additional constraints (2 must cross and 1 broken junction) makes it slow because of the number of variations.
+                    2x2 does run with the same constraints, but it takes a long time, and we're only looking at up to 3
+                    of those constraints.  See the output below, notice the number of puzzles:
+                    
+                </li>
+
+<pre>
+{"numCliqueCircles":0,"numColorOfCliqueCircles":0} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":0,"numColorOfCliqueCircles":0,"numBrokenJunctions":1} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":0,"numColorOfCliqueCircles":0,"numMustCrosses":1} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":0,"numColorOfCliqueCircles":0,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":0,"numColorOfCliqueCircles":0,"numMustCrosses":2} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":0,"numColorOfCliqueCircles":0,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":1,"numColorOfCliqueCircles":1} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":1,"numColorOfCliqueCircles":1,"numBrokenJunctions":1} --> Solve rate: 49.12
+76 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":1,"numColorOfCliqueCircles":1,"numMustCrosses":1} --> Solve rate: 47.36
+76 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":1,"numColorOfCliqueCircles":1,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: 22.61
+88 puzzles with a unique solutions, out of 1368 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":1,"numColorOfCliqueCircles":1,"numMustCrosses":2} --> Solve rate: 22.51
+112 puzzles with a unique solutions, out of 684 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":1,"numColorOfCliqueCircles":1,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: 10.25
+3048 puzzles with a unique solutions, out of 11628 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":1} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":1,"numBrokenJunctions":1} --> Solve rate: 49.12
+114 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":1,"numMustCrosses":1} --> Solve rate: 47.36
+114 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":1,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: 22.61
+132 puzzles with a unique solutions, out of 2052 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":1,"numMustCrosses":2} --> Solve rate: 22.51
+168 puzzles with a unique solutions, out of 1026 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":1,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: 10.25
+4572 puzzles with a unique solutions, out of 17442 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":2} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":2,"numBrokenJunctions":1} --> Solve rate: 21.63
+114 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":2,"numMustCrosses":1} --> Solve rate: 23.53
+12 puzzles with a unique solutions, out of 114 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":2,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: 10.36
+644 puzzles with a unique solutions, out of 2052 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":2,"numMustCrosses":2} --> Solve rate: 11.84
+312 puzzles with a unique solutions, out of 1026 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":2,"numColorOfCliqueCircles":2,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: 4.94
+5348 puzzles with a unique solutions, out of 17442 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":1} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":1,"numBrokenJunctions":1} --> Solve rate: 49.12
+76 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":1,"numMustCrosses":1} --> Solve rate: 47.36
+76 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":1,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: 22.61
+88 puzzles with a unique solutions, out of 1368 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":1,"numMustCrosses":2} --> Solve rate: 22.51
+112 puzzles with a unique solutions, out of 684 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":1,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: 10.25
+3048 puzzles with a unique solutions, out of 11628 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":2} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":2,"numBrokenJunctions":1} --> Solve rate: 10.81
+76 puzzles with a unique solutions, out of 228 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":2,"numMustCrosses":1} --> Solve rate: 11.76
+94 puzzles with a unique solutions, out of 228 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":2,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: 5.18
+1472 puzzles with a unique solutions, out of 4104 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":2,"numMustCrosses":2} --> Solve rate: 5.92
+786 puzzles with a unique solutions, out of 2052 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":2,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: 2.47
+7836 puzzles with a unique solutions, out of 34884 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":3} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":3,"numBrokenJunctions":1} --> Solve rate: 0
+76 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":3,"numMustCrosses":1} --> Solve rate: 0
+76 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":3,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: 0
+1368 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":3,"numMustCrosses":2} --> Solve rate: 0
+684 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":3,"numColorOfCliqueCircles":3,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: 0
+11628 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":1} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":1,"numBrokenJunctions":1} --> Solve rate: 49.12
+19 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":1,"numMustCrosses":1} --> Solve rate: 47.36
+19 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":1,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: 22.61
+22 puzzles with a unique solutions, out of 342 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":1,"numMustCrosses":2} --> Solve rate: 22.51
+28 puzzles with a unique solutions, out of 171 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":1,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: 10.25
+762 puzzles with a unique solutions, out of 2907 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":2} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":2,"numBrokenJunctions":1} --> Solve rate: 5.51
+72 puzzles with a unique solutions, out of 133 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":2,"numMustCrosses":1} --> Solve rate: 5.88
+70 puzzles with a unique solutions, out of 133 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":2,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: 2.64
+712 puzzles with a unique solutions, out of 2394 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":2,"numMustCrosses":2} --> Solve rate: 2.92
+396 puzzles with a unique solutions, out of 1197 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":2,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: 1.25
+3024 puzzles with a unique solutions, out of 20349 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":3} --> Solve rate: NaN
+0 puzzles, each with NaN possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":3,"numBrokenJunctions":1} --> Solve rate: 0
+114 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":3,"numMustCrosses":1} --> Solve rate: 0
+114 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":3,"numMustCrosses":1,"numBrokenJunctions":1} --> Solve rate: 0
+2052 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":3,"numMustCrosses":2} --> Solve rate: 0
+1026 puzzles, each with 12 possible paths to solve.
+{"numCliqueCircles":4,"numColorOfCliqueCircles":3,"numMustCrosses":2,"numBrokenJunctions":1} --> Solve rate: 0
+17442 puzzles, each with 12 possible paths to solve.
+</pre>
+
+            </ul>
+            <h3>Questions</h3>
+            <ul>
+                <li>
+                    Matrice representations of constraints?
+                </li>
+                <li>
+                    Efficiency of code: regenerating constraints each time based on each set.
+                </li>
+
+            </ul>
+            <h3>Next Steps</h3>
+            <ul>
+                <li>Somewhat of a bug: the wraparound groupings because a full broken junction removes full lines</li>
+                <li>
+                    Some rules to drop puzzles from being created: like two coloured squares separated by a broken junction.
+                </li><li>
+                    Visualizations/Charts
+                </li>
+            </ul>
+            <h3>Other Notes/Discussion</h3>
+            <ul>
+                <li>From last time: I'm not sure how the results will be investigated, and am holding off creating a specific library on creating,
+                    managing and visualizing sets of puzzles. It currently works as you can see, but after some iterations 
+                    I'll want to turn the puzzle set management into a library.
+                </li>
+            </ul>
+
+
+
+
+
+        <script type="module" src="./src/main.admin.js"></script>
+        <!-- <script src="./bundle.js"></script> -->
+    </body>
+</html>

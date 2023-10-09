@@ -1,0 +1,206 @@
+<html>
+    <head>
+        <title>The Witness Puzzle</title>
+        <meta name="robots" content="noindex">
+        <meta charset="utf-8"/>
+        <script src="src/lib/_dependencies/moment.js/2.22.2/moment.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
+        <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
+        <link rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
+        <!-- <script src="https://www.gstatic.com/firebasejs/5.0.0/firebase-database.js"></script> -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="google-site-verification" content="uh8PeFJEaWiLXtMePwhCwrsQkLx9-k9AQ8rd5MscA6U" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|Slabo+27px" rel="stylesheet">
+        <style>
+            h1, h2, h3 {
+                font-family: 'Slabo 27px', serif;  
+            }
+            p, body, .caption {
+                font-family: 'Open Sans', sans-serif;
+            }
+            p, h1, h2, h3, li {
+                max-width: 800px;
+            }
+
+            li {
+                margin-bottom: 10px;
+            }
+
+            .loadingSection {
+                background-color: #eee;
+                max-width: 800px;
+                padding: 20px;
+            }
+
+
+            body {
+                margin: 25px;
+                padding-bottom: 80px;
+            }
+
+            a {
+                color: blue;
+                text-decoration: none;
+            }
+
+            .witnessPuzzleContainer {
+                margin: 0px 20px 20px 0px;
+                cursor: pointer;
+            }
+
+            .witnessPuzzleContainer {
+                width: 300px;
+                height: 300px;
+            }
+
+            .witnessPuzzleContainer.medium{
+                width: 200px;
+                height: 200px;
+            }
+
+            .witnessPuzzleContainer.small{
+                width: 100px;
+                height: 100px;
+            }
+
+            .witnessPuzzleContainer.micro{
+                width: 50px;
+                height: 50px;
+            }
+
+
+        </style>
+    </head>
+
+    <body>
+
+        <center>
+            <div id='noES6ModuleLoading' style='display: none;'>
+                <!-- <img id='splashImage' src='public/assets/mdp.ai-splash.png'> -->
+                <div id='splashNoES6Text' class='caption' style='font-size: 11.5px; color: #333; margin-bottom: 10px;'>(If you
+                    use Chrome you'll see a running demo instead of the image above)</div>
+            </div>
+        </center>
+
+            <h1>Updates for 2019-07-16</h1>
+            <h2>Recap from last meeting</h2>
+            <ul>
+                <li>Discussion around looking at adding/removing constraints as a form of information gain / entropy</li>
+                <li>Goal for next time we met was to create puzzles that included variations of multiple constraints in a 3x3 grid 
+                    and see how the constraints affected the rate of solvability for the class of puzzles with the given constraints.
+                </li>
+            </ul>
+            <h2>Updates</h2>
+
+            <div id='updatesSection'>
+                <div class='loadingSection'>
+                    <div class='loadingText'>
+                        <h3>Loading...</h3>
+                        <p>Note: The rest of this page will take a while to populate, the puzzles are being generated...</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Discussion Points and Questions</h2>
+            <h3>General Thoughts</h3>
+            <ul>
+                <li>I'm worried about performance because of the number of possible combinations.  
+                    I haven't started combining in "must cross" and "broken junction" constraints, 
+                    but based on varying just the cliqueCircles constraint, a 3x3 grid takes a long time
+                    to run (1/2 hour?).  This doesn't include varying start or end points, and these all add up to making
+                    the number of puzzles multiple magnitudes higher.
+                </li>
+                <ul>
+                    <li>
+                        The code could certainly be optimized better: right now it's single-threaded and I could dig into 
+                        the solving algorithms to find further improvements.  I'm leaving these for a bit later but 
+                        they might be necessary earlier on.  Additionally, it's running on the browser and could be much 
+                        faster on Node.
+                    </li>
+                    <li>
+                        No results are saved/cached into a file or a database.  If that's done then 
+                        processing would just be a one-time cost, and the project will mainly be about measuring the outcomes, which should be easy and quick.
+                    </li>
+                </ul>
+                <li>I did get the 3x3 grid to run once (larger grids took too long and ran out of memory, 
+                    though I'm not worried about the memory issue since puzzles could be saved to a database or 
+                    local flat file), 
+                    and was surprised by a few things:
+                </li>
+                <ul>
+                    <li>
+                        Note: When I say puzzles are challenging, I mean that as personally trying  
+                        puzzles with a unique solution given a set of constraints, not based
+                            on the rate of solvable puzzles for that set of constraints.
+                    </li>
+                    <li>
+                        Several of the puzzles were much more challenging than I would've 
+                        thought a 3x3 puzzle could be.  The addition of the 3rd colour made 
+                        some of them really challenging.
+                    </li> 
+                    <li>
+                        The challenge of the puzzles seemed to be based on a hump on the number of cliqueCircles: 
+                        at first with few constraints puzzles were quite easy, then it got harder with additional constraints.  At some point, though, 
+                        the more cliqueCircles were added, the simpler the puzzles were to solve.
+                    </li>
+                </ul>
+                <li>
+                    Given the number of combinations for possible puzzles given a variety of constraints 
+                    I wonder if we can't do some Monte Carlo approach if they do get out of hand (I'm thinking combinations for 10x10 or larger puzzles).
+                    At that point brute-force solving the puzzle might be a challenging too, but we could 
+                    create some puzzles and for those that don't have unique solutions, test-run additional constraints on top of it to see 
+                    if we can't get challenging puzzles with only a few solutions.
+                </li>
+            </ul>
+            <h3>Questions</h3>
+            <ul>
+                <li>Any thoughts about the issues with complexity?  I realize symmetry is something to look into, 
+                    and made some improvements already there regarding similar puzzles with different colour combinations. That said I think 
+                    that potentially saves 1/2 the processing time, whereas adding a single constraint creates far greater complexity.
+                </li>
+                <li>
+                    Several of the 3x3 puzzles surprised me by how challenging they could be.  Also, while I do 
+                    think that this can be partly done by measuring the effect constraints have on
+                     reducing the number of possible solutions, 
+                    I wonder if we can determine complexity for a single puzzle.  Would be curious about your thoughts, 
+                    these came to mind for me:
+                </li>
+                <ul>
+                    <li>
+                        Adding individual constraints (like a single cliqueCircle, mustCross or brokenJunction) can 
+                        make a puzzle easier or harder.  Similarly, removing constraints can do the same.
+                    </li>
+                    <li>
+                        There might be some measures we can use as a proxy for ease: number of directly connected 
+                        circles, number of seperated groups of cliqueCircles.
+                    </li>
+                    <li>
+                        It does seem like solutions with fewer constraints resulting in unique solutions are far easier 
+                        than ones with more, but I wonder if that holds true after adding in orthogonal constraints.
+                    </li>
+                </ul>
+
+            </ul>
+            <h3>Next Steps</h3>
+            <ul>
+                <li>I still have to add in the combinations of other constraints, like the "must cross" and "broken junction" ones.</li>
+                <li>
+                    Also, I'll need to visualize the result into a line chart or something else.
+                </li>
+            </ul>
+            <h3>Other Notes/Discussion</h3>
+            <ul>
+                <li>I'm not sure how the results will be investigated, and am holding off creating a specific library on creating,
+                    managing and visualizing sets of puzzles. It currently works as you can see, but after some iterations 
+                    I'll want to turn the puzzle set management into a library.
+                </li>
+            </ul>
+
+
+
+
+
+        <script type="module" src="./src/main.admin.js"></script>
+        <!-- <script src="./bundle.js"></script> -->
+    </body>
+</html>

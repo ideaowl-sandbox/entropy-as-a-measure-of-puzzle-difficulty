@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>The Witness Puzzle</title>
+        <meta name="robots" content="noindex">
+        <meta charset="utf-8"/>
+        <script src="src/lib/_dependencies/moment.js/2.22.2/moment.js"></script>
+
+        <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.css"
+            integrity="sha384-NFGicHNcq1l2DafLerXQeI3h3jJY3dCcDQF+29rtRBHW7P7ti+/XIRY7ALbJOaeh" crossorigin="anonymous">
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.js"
+            integrity="sha384-HELAAZU8xvHgfT/8z4Mhmu+E2z3oBrMEuywaMh/CEd5uTZIDSct7TEaX+S43+dOi"
+            crossorigin="anonymous"></script> -->
+
+        <link rel="stylesheet" href="src/lib/katex/katex.css">
+        <script src="src/lib/katex/katex.js"></script>
+        <script src="src/lib/plotly/plotly-2.11.1.js"></script>
+        
+        <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
+        <!-- <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+
+        <!-- <script src="https://www.gstatic.com/firebasejs/5.0.0/firebase-database.js"></script> -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="google-site-verification" content="uh8PeFJEaWiLXtMePwhCwrsQkLx9-k9AQ8rd5MscA6U" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|Slabo+27px" rel="stylesheet">
+        <style>
+            h1, h2, h3 {
+                font-family: 'Slabo 27px', serif;  
+            }
+            p, body, .caption {
+                font-family: 'Open Sans', sans-serif;
+            }
+            p, h1, h2, h3, li {
+                max-width: 800px;
+            }
+
+            h2 {
+                margin-top: 50px;
+            }
+
+            li {
+                margin-bottom: 10px;
+            }
+
+            li ul li {
+                margin-top: 10px;
+
+            }
+
+            .loadingSection {
+                background-color: #eee;
+                max-width: 800px;
+                padding: 20px;
+            }
+
+
+            body {
+                margin: 25px;
+                padding-bottom: 80px;
+            }
+
+            a {
+                color: blue;
+                text-decoration: none;
+            }
+
+            .witnessPuzzleContainer {
+                margin: 0px 20px 20px 0px;
+                cursor: pointer;
+            }
+
+            .witnessPuzzleContainer {
+                width: 300px;
+                height: 300px;
+            }
+
+            .witnessPuzzleContainer.medium{
+                width: 200px;
+                height: 200px;
+            }
+
+            .witnessPuzzleContainer.small{
+                width: 100px;
+                height: 100px;
+            }
+
+            .witnessPuzzleContainer.micro{
+                width: 50px;
+                height: 50px;
+            }
+            
+
+
+
+
+
+
+
+
+
+            .diffPairsBox {
+                display: inline-block;
+                margin-right: 30px;
+                font-size: 12px;
+            }
+
+            .diffPairs {
+                display: inline-block;
+            }
+
+
+            .diffPairs p {
+                margin: 0px 0px 0px 16px;
+            }
+
+            .diffPairs .witnessPuzzleContainer {
+                margin: 0;
+            }
+
+
+            .puzzleTrajectoriesContent .witnessPuzzleContainer {
+                margin: 0px 20px 20px 0px;
+            }
+
+            .puzzleTrajectoriesContent svg {
+                overflow: visible;
+            }
+
+            .puzzleTrajectoriesContent {
+                display: inline-block;
+                vertical-align: top;
+            }
+
+
+            .puzzleDiv {
+                display: inline-block;
+                text-align: center;
+            }
+
+            .puzzleDiv .witnessPuzzleContainer {
+                margin: 0px;
+            }
+            .puzzleDiv p {
+                margin: 0px;
+                font-size: 12px;
+                margin-top: -10px;
+                cursor: crosshair;
+            }
+
+
+            .uniquePuzzlesSectionsContainerDiv {
+                display: inline-block;
+                vertical-align: top;
+            }
+
+            .puzzleTrajectorySection {
+                width: 400px;
+            }
+
+            .uniquePuzzlesSection {
+                width: calc(100% - 400px);
+            }
+
+
+
+
+
+            #setsGraph {
+                font-size: 12.5px;
+            }
+
+            #setsGraphOverlay {
+                font-size: 11.5px;
+                z-index: 1000;
+            }
+
+            #setsGraph .gridSizeSelect, 
+            #setsGraph .metricSelect, 
+            #setsGraph .metricTypeDiv {
+                vertical-align: top;
+            } 
+
+            #setsGraph .metricSelect {
+                margin-left: 32px;
+            }
+
+            #setsGraph .metricTypeDiv, 
+            #setsGraphOverlay .distributionTitle,
+            #setsGraphOverlay .distributionBar,
+            #setsGraphOverlay .distributionBarText  {
+                display: inline-block;
+            }
+
+            #setsGraphOverlay .distributionsDiv {
+            }
+            
+            #setsGraphOverlay .distributionTitle {
+                width: 20px;
+                font-size: 7px;
+            }
+            #setsGraphOverlay .distributionBar {
+                width: 170px;
+            }
+            #setsGraphOverlay .distributionBarText {
+                width: 30px;
+                font-size: 7px;
+            }
+
+
+            .setsGraphYSelect {
+                transform: rotate(270deg);
+                position: absolute;
+                margin-left: -61px;
+                margin-top: 150px;
+            }
+
+            .setsGraphXSelect {
+                position: absolute;
+                margin-left: 58px;
+                margin-top: 267px;
+            }
+
+
+            .analysisContainer.hideGraphs {
+                /* width: 100% !important; */
+                height: 100% !important;
+            }
+
+            .analysisContainerDiv {
+                position: absolute;
+            }
+
+            .analysisContainerDiv.hideGraphs {
+                position: relative;
+                display: inline-block;
+                margin-top: 0 !important;
+            }
+
+            .analysisContainerDiv.hideGraphs .puzzleTrajectoriesSVGContainer {
+                display: none;
+                margin-top: 0 !important;
+            }
+
+            .sortText {
+                margin-right: 20px;
+                cursor: pointer;
+                color: blue;
+                margin-bottom: 30px;
+            }
+
+
+            .isSorted {
+                font-weight: bold;
+                font-size: 12px;
+                color: rgba(0,150,0,1)
+            }
+
+            .isMustCross.hideMe {
+                display: none !important;
+            }
+
+
+            .puzzleMetaBlocks {
+                position: relative;
+            }
+            .puzzleMetaBlocks > .witnessPuzzleContainer {
+                vertical-align: top;
+            }
+
+            .puzzleDiv {
+                display: inline-block;
+                vertical-align: top;
+            }
+            .directionsDiv {
+                display: inline-block;
+            }
+            .directionDiv {
+                height: 75px;
+                /* padding: 10px; */
+            }
+            .directionDiv.invalidMove {
+                visibility: hidden;
+            }
+            .directionName {
+                display: inline-block;
+                width: 50px;
+                font-size: 15px;
+                vertical-align: top;
+            }
+            .directionInfoGain {
+                display: inline-block;
+                width: 100px;
+                vertical-align: top;
+                font-size: 12px;
+            }
+            .directionPaths {
+                display: inline-block;
+                width: 720px;
+                
+                height: 75px;
+            }
+            .nextPathPuzzles {
+                display: inline-block;
+            }
+            .formula {
+                margin-bottom: 10px;
+            }
+            .discussionText {
+                margin-bottom: 10px;
+                width: 800px;
+            }
+            .formulaSection {
+                display: inline-block;
+                vertical-align: top;
+                margin-right: 20px;
+                margin-bottom: 20px;
+                padding: 10px 10px 0px 10px;
+                border: 1px solid #eee;
+            }
+            .formulaSections {
+                vertical-align: top;
+            }
+
+            .reasoningFormulaState .base {
+                margin-bottom: 10px;
+            }
+
+            .reasoningFormula {
+                display: block;
+            }
+
+            #entropyChart {
+                display: block;
+            }
+
+            .pathOutcomesSection table, .nekPathOutcomesSection table {
+                table-layout: fixed;
+                font-size: 12px;
+                border: 1px solid #ccc;
+            }
+
+            .pathOutcomesSection table tr:nth-child(odd), .nekPathOutcomesSection table tr:nth-child(odd){
+                background-color: #eee;
+                /* color: #fff; */
+            }
+
+            .pathOutcomesSection table td:nth-child(1), .nekPathOutcomesSection table td:nth-child(1) {
+                width: 200px;
+            }
+
+            .pathOutcomesSection table td:nth-child(2), .nekPathOutcomesSection table td:nth-child(2) {
+                width: 400px;
+            }
+            .pathOutcomesSection table td:nth-child(3), .nekPathOutcomesSection table td:nth-child(3) {
+                width: 400px;
+            }
+            .pathOutcomesSection table td:nth-child(4), .nekPathOutcomesSection table td:nth-child(4) {
+                width: 200px;
+            }
+            .pathOutcomesSection table td:nth-child(5), .nekPathOutcomesSection table td:nth-child(5) {
+                width: 200px;
+            }
+
+            .nekOutcomesTitle {
+                margin-top: 15px;
+            }
+
+            .entropyLink {
+                font-size: 10px;
+                margin-top: -26px;
+                color: blue;
+                margin-left: 8px;
+                cursor: pointer;
+            }
+
+            .routeEntropyPuzzle {
+                display: inline-block;
+                font-size: 12px;
+            }
+
+
+
+            .puzzleBlocksSection, .curriculumBlocksSection, .solutionsDiv, .solutionDiv, .trajectorySteps, .trajectoryStep {
+                display: inline-block;
+                vertical-align: top;
+            }
+
+            .curriculumBlocksSection .witnessPuzzleContainer {
+                margin: 0px;
+            }
+
+            .trajectorySteps {
+                width: 230px;
+                height: 180px;
+                overflow-y: auto;
+            }
+
+            .trajectoryStep {
+                opacity: 0.4;
+            }
+            .trajectoryStep.hasEntropy {
+                opacity: 1;
+            }
+            
+            .solutionsDiv {
+                margin-left: 20px;
+            }
+            .solutionText {
+                position:absolute;
+                top: 108px;
+                font-size: 12px;
+            }
+            .trajText {
+                position:absolute;
+                top: 50px;
+                font-size: 10px;
+                display: none;
+            }
+
+
+
+        </style>
+    </head>
+
+    <body>
+
+        <center>
+            <div id='noES6ModuleLoading' style='display: none;'>
+                <!-- <img id='splashImage' src='public/assets/mdp.ai-splash.png'> -->
+                <div id='splashNoES6Text' class='caption' style='font-size: 11.5px; color: #333; margin-bottom: 10px;'>(If you
+                    use Chrome you'll see a running demo instead of the image above)</div>
+            </div>
+        </center>
+
+            <h1>Updates for 2022-08-18</h1>
+
+            
+                <h2>Summary From Last Meetings</h2>
+                <ul>
+                    <li>
+                        <a href="https://www.figma.com/file/x6840nF9dsfGoqTQaFTlMm/Eugene's-Thesis?node-id=0%3A1" target="_blank">
+                            Figma Notes
+                        </a>
+                    </li>
+                </ul>
+
+                <h2>Minimum Solution(s) Entropy</h2>
+<!--
+
+                <h3>New formulas</h3>
+                <ul>
+                    <li>Make dead ends as a "loss" outcome.</li>
+                </ul>
+                <h3>Adding in No-End-Knowledge Information Gain Outcomes</h3>
+<h2>Definitions (from last week)</h2>
+
+<h3>Entropy as applied to Puzzle</h3>
+<div id="formulaBinaryEntropy" class="formula"></div>
+<div id="formulaEntropy" class="formula"></div>
+<div class="discussionText">Where <i>p</i> is the number of positive outcomes, <i>n</i> is negative.</div>
+<div class="discussionText">
+    The approach I'm taking here is assuming dead ends
+    or finishing the game but not solving the puzzle is a negative <i>n</i> outcome.
+    Solving the puzzle results in a positive <i>p</i> outcome.
+</div>
+<h3>Information Gain</h3>
+<div class="discussionText">Definition (from textbook): The <b>information gain</b> from the attribute test on <i>A</i>
+    is the expected reduction in entropy</div>
+<div id="formulaInfoGain" class="formula"></div>
+<div class="discussionText">
+    Where <i>Remainder(A)</i> is essentially a weighted entropy based on the number of
+    outcomes. Specifically:
+</div>
+<div id="formulaRemainder" class="formula"></div>
+<div class="discussionText">
+    From the textbook, an attribute <i>A</i> with <i>d</i> distinct values divides the training set E into subsets E1, .
+    . . , Ed.
+    Each subset Ek has pk positive examples and nk negative examples, so if we go along that
+    branch, we will need an additional B(pk/(pk + nk)) bits of information to answer the question.
+</div>
+
+                <div id="formulaBinaryEntropy" class="formula"></div>
+                <div id="formulaEntropy" class="formula"></div>
+                <div class="discussionText">Where <i>p</i> is the number of positive outcomes, <i>n</i> is negative.</div>
+
+
+
+
+            <div id='updatesSection' style='position: relative;'>
+                <div class='loadingSection'>
+                    <div class='loadingText'>
+                        <h3>Loading...</h3>
+                        <p>Note: The rest of this page will take a while to populate, puzzles being calculated and rendered</p>
+                    </div>
+                </div>
+            </div> <h2>Dead-ends: Negative Outcome vs Unknown</h2>
+            <div id='endingPaths'></div>
+
+            <div id="mathFormulas">
+                <h3>Concern</h3>
+                <div class="discussionText">
+                    With the approach of dead ends or reaching the endpoint of a puzzle as number of outcomes, 
+                    choosing to take actions, like moving up or right, the number of total outcomes <i>changes</i>.
+                    There is one instance where the total outcomes are the same: basically the state of considering 
+                    all actions, see below.
+                </div>
+
+            </div>
+
+            <h2>Live Path-based InfoGain</h2>
+-->
+
+
+
+            <div id='pathInfoGain'>
+                <div id='livePuzzle'></div>
+            </div>
+
+
+            <!--
+            <h2>Discussion Points and Questions</h2>
+            <h3>General Thoughts</h3>
+
+            <ul>
+                <li>Added in s' information gain</li>
+            </ul>
+
+            <ul>
+                <li>Going over the non-binary entropy (slides)</li>
+            </ul>
+
+            <ul>
+                <li>Tea time talks</li>
+                <li>
+                    Updates
+                    <ul>
+                        <li>Redid chart axis + zooming, because</li>
+                        <ul>
+                            <li>the negative upvotes hanging in a log scale made the chart feel wrong</li>
+                            <li>previous version was somewhat buggy</li>
+                            <li>felt like there were patterns obsfucated from log scale, and the outliers in linear were an issue.  This rescaling effort should allow us to filter those out.</li>
+                        </ul>
+                        <li>Added highlight of Nathan's puzzles</li>
+                        <li>Note that there's no longer zooming/panning on the chart itself, it's only on the axes.</li>
+                    </ul>
+
+
+                </li>
+            </ul>
+
+--><!--
+            <h3>Questions</h3>
+            <ul>
+                 
+                <li>
+                    Mainly questions around the approach around 
+                    a state-to-state change in entropy as information gain.
+                </li>
+
+                <li>
+                    Thoughts around ideas:
+<ul>
+    <li>(Discussed above) Remove dead-ends as a negative outcome.</li>
+    <li>(Discussed above) Only accruing information gain due to reasoning modules.</li>
+    <li>(Discussed above) "Positive and negative" entropy.</li>
+    <li>Comparing path-based information gain with pure probability to outcomes.</li>
+    <li>Repeated use of reasoning module does not add towards information gain.</li>
+    <li>Modeling user knowledge with stochastic application of reasoning.</li>
+    <li>Using ML on various scores, including number of paths to solution.</li>
+</ul>
+                </li>
+
+            </ul>-->
+
+            <!-- <h3>My Planned Next Steps</h3>
+            <ul>
+                <li>Update the puzzle to know, on each step, if the step you just took made solving the puzzle impossible.</li>
+                <ul>
+                    <li>This will help with invalidating possible solutions, and make puzzle solving faster</li>
+                    <li>I'll probably put a visual indicator to allow debugging on the fly</li>
+                    <li>For measuring complexity, it's likely the step you just took will measure the number of possible, immediate next steps</li>
+                </ul>
+            </ul> -->
+            <!-- <h3>Other Notes/Discussion</h3>
+            <ul>
+                <li>From last time: I'm not sure how the results will be investigated, and am holding off creating a specific library on creating,
+                    managing and visualizing sets of puzzles. It currently works as you can see, but after some iterations 
+                    I'll want to turn the puzzle set management into a library.
+                </li>
+            </ul> -->
+
+
+
+
+
+        <!-- <script type="module" src="./src/main.admin.js"></script> -->
+        <!-- <script type="module" src="./src/prototyping-stars.js"></script> -->
+        <!-- <script type="module" src="./src/convertWindmillPuzzles.js"></script> -->
+        <!-- <script type="module" src="./src/analyzeTrajectory.js"></script> -->
+        <!-- <script type="module" src="./src/pure-infogain-approach.js"></script> -->
+        <!-- <script type="module" src="./src/2022-03-24-various-path-infogain.js"></script> -->
+        <!-- <script type="module" src="./src/2022-06-09-curriculum-ranking.js"></script> -->
+        <!-- <script type="module" src="./src/2022-08-11-solution-entropy.js"></script> -->
+        <script type="module" src="./src/2022-08-18-min-solution-entropy.js"></script>
+        <!-- <script type="module" src="./src/analyzeLitw.js"></script> -->
+
+        <!-- <script src="./bundle.js"></script> -->
+    </body>
+</html>                     

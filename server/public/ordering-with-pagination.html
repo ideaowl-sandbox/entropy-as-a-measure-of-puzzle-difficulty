@@ -1,0 +1,368 @@
+<html>
+    <head>
+        <title>The Witness Puzzle</title>
+        <meta name="robots" content="noindex">
+        <meta charset="utf-8"/>
+        <script src="src/lib/_dependencies/moment.js/2.22.2/moment.js"></script>
+        <!-- <script src="https://www.gstatic.com/firebasejs/5.0.0/firebase-database.js"></script> -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="google-site-verification" content="uh8PeFJEaWiLXtMePwhCwrsQkLx9-k9AQ8rd5MscA6U" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300|Slabo+27px" rel="stylesheet">
+        <style>
+            h1, h2, h3 {
+                font-family: 'Slabo 27px', serif;  
+            }
+            p, body, .caption {
+                font-family: 'Open Sans', sans-serif;
+            }
+            p, h1, h2, h3, li {
+                max-width: 800px;
+            }
+
+            li {
+                margin-bottom: 10px;
+            }
+
+            .loadingSection {
+                background-color: #eee;
+                max-width: 800px;
+                padding: 20px;
+            }
+
+
+            body {
+                margin: 25px;
+                padding-bottom: 80px;
+            }
+
+            a {
+                color: blue;
+                text-decoration: none;
+            }
+
+            .witnessPuzzleContainer {
+                margin: 0px 20px 20px 0px;
+                cursor: pointer;
+            }
+
+            .witnessPuzzleContainer {
+                width: 300px;
+                height: 300px;
+            }
+
+            .witnessPuzzleContainer.medium{
+                width: 200px;
+                height: 200px;
+            }
+
+            .witnessPuzzleContainer.small{
+                width: 100px;
+                height: 100px;
+            }
+
+            .witnessPuzzleContainer.micro{
+                width: 50px;
+                height: 50px;
+            }
+            
+
+
+
+
+
+
+
+
+
+            .diffPairsBox {
+                display: inline-block;
+                margin-right: 30px;
+                font-size: 12px;
+            }
+
+            .diffPairs {
+                display: inline-block;
+            }
+
+
+            .diffPairs p {
+                margin: 0px 0px 0px 16px;
+            }
+
+            .diffPairs .witnessPuzzleContainer {
+                margin: 0;
+            }
+
+
+            .puzzleTrajectoriesContent .witnessPuzzleContainer {
+                margin: 0px 20px 20px 0px;
+            }
+
+            .puzzleTrajectoriesContent svg {
+                overflow: visible;
+            }
+
+            .puzzleTrajectoriesContent {
+                display: inline-block;
+                vertical-align: top;
+            }
+
+
+            .puzzleDiv {
+                display: inline-block;
+                text-align: center;
+            }
+
+            .puzzleDiv .witnessPuzzleContainer {
+                margin: 0px;
+            }
+            .puzzleDiv p {
+                margin: 0px;
+                font-size: 12px;
+                margin-top: -10px;
+                cursor: crosshair;
+            }
+
+
+            .uniquePuzzlesSectionsContainerDiv {
+                display: inline-block;
+                vertical-align: top;
+            }
+
+            .puzzleTrajectorySection {
+                width: 400px;
+            }
+
+            .uniquePuzzlesSection {
+                width: calc(100% - 400px);
+            }
+
+
+
+
+
+            #setsGraph {
+                font-size: 12.5px;
+            }
+
+            #setsGraphOverlay {
+                font-size: 11.5px;
+                z-index: 1000;
+            }
+
+            #setsGraph .gridSizeSelect, 
+            #setsGraph .metricSelect, 
+            #setsGraph .metricTypeDiv {
+                vertical-align: top;
+            } 
+
+            #setsGraph .metricSelect {
+                margin-left: 32px;
+            }
+
+            #setsGraph .metricTypeDiv, 
+            #setsGraphOverlay .distributionTitle,
+            #setsGraphOverlay .distributionBar,
+            #setsGraphOverlay .distributionBarText  {
+                display: inline-block;
+            }
+
+            #setsGraphOverlay .distributionsDiv {
+            }
+            
+            #setsGraphOverlay .distributionTitle {
+                width: 20px;
+                font-size: 7px;
+            }
+            #setsGraphOverlay .distributionBar {
+                width: 170px;
+            }
+            #setsGraphOverlay .distributionBarText {
+                width: 30px;
+                font-size: 7px;
+            }
+
+
+            .setsGraphYSelect {
+                transform: rotate(270deg);
+                position: absolute;
+                margin-left: -61px;
+                margin-top: 150px;
+            }
+
+            .setsGraphXSelect {
+                position: absolute;
+                margin-left: 58px;
+                margin-top: 267px;
+            }
+
+
+            .analysisContainer.hideGraphs {
+                /* width: 100% !important; */
+                height: 100% !important;
+            }
+
+            .analysisContainerDiv {
+                position: absolute;
+            }
+
+            .analysisContainerDiv.hideGraphs {
+                position: relative;
+                display: inline-block;
+                margin-top: 0 !important;
+            }
+
+            .analysisContainerDiv.hideGraphs .puzzleTrajectoriesSVGContainer {
+                display: none;
+                margin-top: 0 !important;
+            }
+
+            .sortText {
+                margin-right: 20px;
+                cursor: pointer;
+                color: blue;
+                margin-bottom: 30px;
+            }
+
+
+            .isSorted {
+                font-weight: bold;
+                font-size: 12px;
+                color: rgba(0,150,0,1)
+            }
+
+            .isMustCross.hideMe {
+                display: none !important;
+            }
+
+
+            .puzzleMetaBlocks {
+                position: relative;
+            }
+            .puzzleMetaBlocks > .witnessPuzzleContainer {
+                vertical-align: top;
+            }
+
+            .buttonContainer {
+                margin-top: 10px;
+            }
+
+            .buttonContainer button {
+                display: inline-block;
+                margin-right: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <center>
+            <div id='noES6ModuleLoading' style='display: none;'>
+                <!-- <img id='splashImage' src='public/assets/mdp.ai-splash.png'> -->
+                <div id='splashNoES6Text' class='caption' style='font-size: 11.5px; color: #333; margin-bottom: 10px;'>(If you
+                    use Chrome you'll see a running demo instead of the image above)</div>
+            </div>
+        </center>
+
+            <h1>2023-02-04: Generated Puzzles</h1>
+            <!-- <h2>What was done, covered for last meeting</h2>
+            <ul>
+                <li>Dates added</li>
+                <li>upvotes to minSolutionEntropy Coefficient: <span id="upvote-to-minSolutionEntropy-coeff"></span> </li>
+                <li>Pearson Correlation Coefficient: <span id="pearson-coeff"></span> </li>
+            </ul> -->
+<!--  
+            <h2>Notes for this week's updates:</h2>
+            <h3>Puzzles Below</h3>
+            <ul>
+
+                <li>
+                    Glossary
+                    <ul>
+                        <li>Every path visited by the algorithm is shown.</li>
+                        <li>Faded paths indicate <b>no</b> information gain occuring at that point.</li>
+                        <li>Paths that aren't faded indicate information gain occuring at that point.</li>
+                    </ul>
+                </li>
+
+                <li>
+                    What the 3 puzzle represent
+                    <ul>
+                        <li>An empty grid has many visited paths but no information gain.</li>
+                        <li>A challenging puzzle allows a player to go through a smaller number of paths by pruning away non-win paths based on visited constraints, obtaining information along the way.</li>
+                        <li>A trivial puzzle has many constraints, greatly reducing the number of non-winnable next paths.</li>
+                    </ul>
+                </li>
+
+
+            </ul> -->
+
+            <!-- <h2>Next steps from previous previous discussion</h2>
+            
+            <li>Try to understand and then map the puzzles over so that</li>
+            <ul>
+                <li>We can see if any patterns for upvotes, solves come up on challenge/interest</li>
+                <li>We can measure our fitness function on the puzzles and see if a correlation occurs</li>
+            </ul>
+            
+            <li>Look at classes in the new term over the possibility of finishing course requirements in this term.</li> -->
+
+            <!-- <h2>Updates</h2> -->
+
+            <div id='updatesSection' style='position: relative;'>
+                <div class='loadingSection'>
+                    <div class='loadingText'>
+                        <h3>Loading...</h3>
+                        <p>Note: The rest of this page will take a while to populate, there's a 10MB file for 35k puzzles with unique solutions being downloaded...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <h2>Discussion Points and Questions</h2>
+            <h3>General Thoughts</h3>
+            <ul>
+
+                <li>
+                    Updates
+                    <ul>
+                        <li>Was able to a spread of results by number of solves</li>
+                        <li>(Not on by default) In-code filtering of dates</li>
+                        <li>(Not on by default) Filtering for existing Witness puzzles</li>
+                    </ul>
+
+
+                </li>
+            </ul>
+
+
+            <h3>Questions</h3>
+            <ul>
+
+            </ul> -->
+
+            <!-- <h3>My Planned Next Steps</h3>
+            <ul>
+                <li>Update the puzzle to know, on each step, if the step you just took made solving the puzzle impossible.</li>
+                <ul>
+                    <li>This will help with invalidating possible solutions, and make puzzle solving faster</li>
+                    <li>I'll probably put a visual indicator to allow debugging on the fly</li>
+                    <li>For measuring complexity, it's likely the step you just took will measure the number of possible, immediate next steps</li>
+                </ul>
+            </ul> -->
+            <!-- <h3>Other Notes/Discussion</h3>
+            <ul>
+                <li>From last time: I'm not sure how the results will be investigated, and am holding off creating a specific library on creating,
+                    managing and visualizing sets of puzzles. It currently works as you can see, but after some iterations 
+                    I'll want to turn the puzzle set management into a library.
+                </li>
+            </ul> -->
+
+
+
+        <script src="./src/lib/statistics/statistics.min.js" type="text/javascript"></script>
+        
+        <!-- Ordering puzzles -->
+        <script type="module" src="./src/ORDERING-WITH-PAGINATION.js"></script>
+
+    </body>
+</html>
